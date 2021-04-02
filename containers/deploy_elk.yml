@@ -1,0 +1,65 @@
+- name: Deploy ELK with Docker
+  hosts: physical
+  gather_facts: no
+
+  tasks:
+    - name: Install dependencies
+      package:
+        name:
+          - python-pip
+        state: present
+
+    - name: Install Python Docker
+      shell: "pip install docker"
+
+    - name: Create ELK Directory data01
+      file:
+        path: "{{ srv_DOCKER }}/volumes/elk/data01"
+        state: directory
+        owner: 1000
+        group: 0
+        mode: 0775
+
+    - name: Create ELK Directory data02
+      file:
+        path: "{{ srv_DOCKER }}/volumes/elk/data02"
+        state: directory
+        owner: 1000
+        group: 0
+        mode: 0775
+
+    - name: Create ELK Directory data03
+      file:
+        path: "{{ srv_DOCKER }}/volumes/elk/data03"
+        state: directory
+        owner: 1000
+        group: 0
+        mode: 0775
+
+    - name: Copy `docker-compose`
+      template:
+        src: "./elk/docker-compose.yml.j2"
+        dest: "{{ srv_DOCKER }}/volumes/elk/docker-compose.yml"
+        owner: root
+        group: root
+        mode: "0644"
+        backup: yes
+
+    - name: launch `docker-compose`
+      shell: "docker-compose up -d"
+      args:
+        chdir: "{{ srv_DOCKER }}/volumes/elk/"
+
+    - firewalld:
+        zone: public
+        port: 5601/tcp
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+    - firewalld:
+        zone: public
+        port: 9200/tcp
+        permanent: yes
+        immediate: yes
+        state: enabled

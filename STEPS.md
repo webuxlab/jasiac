@@ -292,7 +292,12 @@ cd containers/
 
 ## Iron Functions Container
 ansible-playbook -i inventory/production deploy_ironfunctions.yml --user tgingras --become --ask-become
+```
 
+```bash
+
+# ELK
+ansible-playbook -i inventory/production containers/deploy_elk.yml --user tgingras --become --ask-become
 ```
 
 ## Clients (script to deploy tools on clients)
